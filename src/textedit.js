@@ -38,6 +38,41 @@ function initHelpIds() {
 
 $(document).ready(function() {
     var editor = global.ace.edit($('#textedit-modal .editor')[0]);
+    editor.$blockScrolling = Infinity
+    const edit = document.getElementById('textedit-modal')
+    if (edit) {
+        edit.addEventListener('paste', (e) => {
+            e.preventDefault()
+            const data = (e.clipboardData || window.clipboardData).getData('text')
+            const strLength = 80
+            if (data.length > strLength) {
+                let text = ''
+                let end = false
+                let counter = 0
+                const wordsArr = data.split(/(\s)/)
+                for (const word of wordsArr) {
+                    counter += word.length
+                    if (counter > strLength) {
+                        text += '\n'
+                        counter = word.length
+                        end = true
+                    }
+                    if (!end) {
+                        text += word
+                    } else {
+                        end = !end
+                        if (word.match(/\s/)) {
+                            counter = 0
+                        } else {
+                            text += word
+                        }
+                    }
+                    
+                }
+                editor.setValue(text)
+            }
+        })
+    }
 
     editor.setTheme('ace/theme/monokai');
 
@@ -45,6 +80,7 @@ $(document).ready(function() {
         editor.setValue(text);
         $('#textedit-modal').modal('show');
 
+        
         if (arg === 'help') {
             $('#textedit-modal input').show();
             initHelpIds();
